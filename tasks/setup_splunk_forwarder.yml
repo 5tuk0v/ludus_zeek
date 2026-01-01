@@ -1,0 +1,15 @@
+---
+# tasks/setup_splunk_forwarder.yml
+# From Splunk Attack Range Zeek setup (https://github.com/splunk/attack_range/blob/fe7392ccaaf2ef1a04b263efc5411e5078a28995/terraform/ansible/roles/zeek_sensor/tasks/splunkuf.yml)
+
+- name: copy inputs.conf to capture zeek logs
+  copy:
+    src: inputs.conf
+    dest: /opt/splunkforwarder/etc/system/local/inputs.conf
+    force: yes
+
+- name: Restart splunk uf
+  become: true
+  systemd:
+    name: SplunkForwarder
+    state: restarted

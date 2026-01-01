@@ -1,0 +1,42 @@
+---
+# tasks/configure_zeek.yml
+# Inspired by Splunk Attack Range Zeek role (https://github.com/splunk/attack_range/)
+
+- name: Enable Zeek logging in JSON format and ignore checksum errors
+  become: true
+  ansible.builtin.lineinfile:
+    path: '/opt/zeek/share/zeek/site/local.zeek'
+    line: '{{ item }}'
+    insertafter: EOF
+  loop:
+    - '# Enable Zeek logging in JSON format - best for SIEM ingestion'
+    - 'redef LogAscii::json_timestamps = JSON::TS_ISO8601;'
+    - 'redef LogAscii::use_json = T;'
+    - '# Ignore checksum errors - seems needed for Proxmox virtual NICs'
+    - 'redef ignore_checksums = T;'
+
+- name: Update Zeek node.cfg with the correct interface
+  become: true
+  ansible.builtin.replace:
+    path: /opt/zeek/etc/node.cfg
+    regexp: '^interface=.*$'
+    replace: "interface={{ ludus_zeek_nic_name }}"
+  when: ludus_zeek_nic_name is defined
+
+- name: Run Zeek deploy
+  shell: '/opt/zeek/bin/zeekctl {{ item }}'
+  become: true
+  with_items:
+    - 'install'
+    - 'deploy'
+    - 'status'
+
+- name: Check Zeek logs for errors
+  shell: '/opt/zeek/bin/zeekctl diag'
+  become: true
+  register: zeek_diag
+  failed_when: false
+
+- name: Display Zeek diagnostic information
+  debug:
+    var: zeek_diag.stdout_lines

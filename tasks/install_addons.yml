@@ -1,0 +1,18 @@
+---
+# tasks/install_addons.yml
+
+- name: Verify zkg is present
+  ansible.builtin.stat:
+    path: /opt/zeek/bin/zkg
+  register: ludus_zeek_zkg_stat
+
+- name: Fail if zkg is missing
+  ansible.builtin.fail:
+    msg: "zkg not found at /opt/zeek/bin/zkg; Zeek installation is incomplete"
+  when: not ludus_zeek_zkg_stat.stat.exists
+
+- name: Install Zeek addons
+  ansible.builtin.command:
+    cmd: "/opt/zeek/bin/zkg install {{ item }} --force"
+  loop: "{{ ludus_zeek_addons }}"
+  become: true

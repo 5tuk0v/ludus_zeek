@@ -1,0 +1,64 @@
+---
+# tasks/install_zeek.yml
+
+- name: Determine Zeek distro codename
+  set_fact:
+    ludus_zeek_distro_codename: >-
+      {{ ('xUbuntu_' + ansible_distribution_version) if ansible_distribution == 'Ubuntu'
+         else ('Debian_' + ansible_distribution_version) if ansible_distribution == 'Debian'
+         else 'unsupported' }}
+
+- name: Fail if unsupported distro
+  ansible.builtin.fail:
+    msg: "This role is only supported on Ubuntu or Debian (got {{ ansible_distribution }})"
+  when: ludus_zeek_distro_codename == "unsupported"
+
+- name: Download Zeek Release.key and dearmor
+  ansible.builtin.get_url:
+    url: "{{ ludus_zeek_repo_base }}/{{ ludus_zeek_distro_codename }}/Release.key"
+    dest: "/tmp/security_zeek.key"
+    mode: '0644'
+    force: yes
+  become: true
+
+- name: Convert Zeek key to gpg format
+  ansible.builtin.command:
+    cmd: "gpg --dearmor /tmp/security_zeek.key"
+    creates: "/tmp/security_zeek.key.gpg"
+  become: true
+
+- name: Move dearmored key to trusted.gpg.d
+  ansible.builtin.copy:
+    src: "/tmp/security_zeek.key.gpg"
+    dest: "/etc/apt/trusted.gpg.d/security_zeek.gpg"
+    remote_src: true
+    mode: '0644'
+  become: true
+
+- name: Add Zeek repository
+  ansible.builtin.copy:
+    dest: "/etc/apt/sources.list.d/security:zeek.list"
+    content: "deb {{ ludus_zeek_repo_base }}/{{ ludus_zeek_distro_codename }}/ /"
+    mode: '0644'
+  become: true
+
+- name: Install Zeek
+  ansible.builtin.apt:
+    name: zeek
+    state: present
+    update_cache: true
+  become: true
+
+- name: Create symlink for zeekctl in /usr/local/bin
+  ansible.builtin.file:
+    src: /opt/zeek/bin/zeekctl
+    dest: /usr/local/bin/zeekctl
+    state: link
+  become: true
+
+- name: Create symlink for zkg in /usr/local/bin
+  ansible.builtin.file:
+    src: /opt/zeek/bin/zkg
+    dest: /usr/local/bin/zkg
+    state: link
+  become: true  
