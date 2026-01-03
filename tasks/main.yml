@@ -3,13 +3,9 @@
 
 - import_tasks: install_zeek.yml
 
-- import_tasks: configure_nic.yml
-  when: ludus_zeek_nic_name is defined and ludus_zeek_nic_promisc | bool
-
 - import_tasks: install_addons.yml
   when: ludus_zeek_install_addons | bool
 
-- import_tasks: configure_zeek.yml
+- import_tasks: configure_interface.yml
 
-- import_tasks: setup_splunk_forwarder.yml
-  when: ludus_zeek_splunk_forwarder_enabled | bool
+- import_tasks: configure_zeek.yml

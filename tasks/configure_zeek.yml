@@ -4,16 +4,15 @@
 
 - name: Enable Zeek logging in JSON format and ignore checksum errors
   become: true
-  ansible.builtin.lineinfile:
+  ansible.builtin.blockinfile:
     path: '/opt/zeek/share/zeek/site/local.zeek'
-    line: '{{ item }}'
-    insertafter: EOF
-  loop:
-    - '# Enable Zeek logging in JSON format - best for SIEM ingestion'
-    - 'redef LogAscii::json_timestamps = JSON::TS_ISO8601;'
-    - 'redef LogAscii::use_json = T;'
-    - '# Ignore checksum errors - seems needed for Proxmox virtual NICs'
-    - 'redef ignore_checksums = T;'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Ludus Zeek Configuration"
+    block: |
+      # Enable Zeek logging in JSON format - best for SIEM ingestion
+      redef LogAscii::json_timestamps = JSON::TS_ISO8601;
+      redef LogAscii::use_json = T;
+      # Ignore checksum errors - seems needed for Proxmox virtual NICs
+      redef ignore_checksums = T;
 
 - name: Update Zeek node.cfg with the correct interface
   become: true
@@ -23,20 +22,28 @@
     replace: "interface={{ ludus_zeek_nic_name }}"
   when: ludus_zeek_nic_name is defined
 
-- name: Run Zeek deploy
-  shell: '/opt/zeek/bin/zeekctl {{ item }}'
+- name: Install Zeek configuration
+  ansible.builtin.command:
+    cmd: '/opt/zeek/bin/zeekctl install'
   become: true
-  with_items:
-    - 'install'
-    - 'deploy'
-    - 'status'
+  register: zeek_install
+  changed_when: "'removing old policies' in zeek_install.stdout or 'creating policy directories' in zeek_install.stdout"
 
-- name: Check Zeek logs for errors
-  shell: '/opt/zeek/bin/zeekctl diag'
+- name: Deploy Zeek
+  ansible.builtin.command:
+    cmd: '/opt/zeek/bin/zeekctl deploy'
   become: true
-  register: zeek_diag
+  register: zeek_deploy
+  changed_when: "'starting' in zeek_deploy.stdout or 'stopping' in zeek_deploy.stdout"
+
+- name: Check Zeek status
+  ansible.builtin.command:
+    cmd: '/opt/zeek/bin/zeekctl status'
+  become: true
+  register: zeek_status
+  changed_when: false
   failed_when: false
 
-- name: Display Zeek diagnostic information
-  debug:
-    var: zeek_diag.stdout_lines
+- name: Display Zeek status
+  ansible.builtin.debug:
+    var: zeek_status.stdout_lines

@@ -1,0 +1,36 @@
+---
+# tasks/configure_interface.yml
+
+- name: Enable promiscuous mode on interface (runtime)
+  become: true
+  ansible.builtin.command:
+    cmd: "ip link set {{ ludus_zeek_nic_name }} promisc on"
+  changed_when: false
+  when: ludus_zeek_nic_name is defined
+
+- name: Create systemd service to enable promiscuous mode on boot
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/zeek-promisc.service
+    content: |
+      [Unit]
+      Description=Enable promiscuous mode for Zeek interface
+      After=network.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/sh -c '/usr/sbin/ip link set {{ ludus_zeek_nic_name }} promisc on || /sbin/ip link set {{ ludus_zeek_nic_name }} promisc on'
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+  when: ludus_zeek_nic_name is defined
+
+- name: Enable and start zeek-promisc service
+  become: true
+  ansible.builtin.systemd:
+    name: zeek-promisc
+    enabled: yes
+    daemon_reload: yes
+  when: ludus_zeek_nic_name is defined

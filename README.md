@@ -1,6 +1,8 @@
 # Ansible Role: Zeek ([Ludus](https://ludus.cloud))
 
-An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubuntu hosts in Ludus environments, providing network telemetry until native Zeek support lands in the Ludus flavor of the [Splunk Attack Range](https://github.com/splunk/attack_range).
+An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubuntu hosts in Ludus environments. 
+
+**I initially made this role to add Zeek to my Ludus [Splunk Attack Range](https://github.com/splunk/attack_range). Shortly after publishing it, I realized that @P4T12ICK had already made an [Attack Range-specific role for Ludus](https://github.com/P4T12ICK/ludus_ar_zeek), and I didn't know about it. Lesson learned, next time I need to check Galaxy beforehand. If you are looking to add Zeek to your Ludus Splunk Attack Range, definitely use P4T12ICK's role. I have since removed all Splunk parts from this role, but figured I could keep it around for people who want to simply add Zeek to a range without Splunk.**
 
 > [!WARNING]
 > This role deploys a very minimal and unoptimized Zeek setup that uses the VM’s primary network interface for packet capture. This configuration probably violates multiple best practices and is intended only for small, controlled test environments. Capturing high volumes of traffic may lead to packet loss, performance degradation, or unstable behavior.
@@ -8,7 +10,6 @@ An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubu
 ## Requirements
 
 - A Debian (bullseye, bookworm, trixie) or Ubuntu (focal, jammy, noble) host.  
-- If you wish to send the Zeek logs to Splunk, your life will be made easier if you also have the `p4t12ick.ludus_ar_linux` role on the host you are deploying Zeek to. This is not mandatory however, just set the `ludus_zeek_splunk_forwarder_enabled` variable to `false` if you are not doing this.
 - To capture traffic across the entire VLAN, `bridge-ageing` must be disabled on the bridge interface of the range **on the Proxmox host**. Make sure to check [the Ludus documentation](https://docs.ludus.cloud/docs/networking#packet-capture).
 
 ## Role Variables
@@ -21,19 +22,12 @@ ludus_zeek_install_addons: false
 ludus_zeek_addons:
   - bzar
 
-# If used with Splunk Attack Range, Zeek logs can be forwarded to Splunk using the existing Splunk Universal Forwarder
-# When set to true, the role copies the `inputs.conf` file to the host and restarts the UF service
-# You only need to install the Zeek TA on the Splunk server to consume the logs
-ludus_zeek_splunk_forwarder_enabled: true
-
 # Zeek OBS repository base
 ludus_zeek_repo_base: "https://download.opensuse.org/repositories/security:/zeek"
 
 # NIC configuration
-# `ens18` is the default interface on Ludus VMs (at least in my environment)
-# Promiscuous mode must be enabled to capture all traffic on the interface
+# ens18 is the default interface on Ludus VMs (at least in my environment)
 ludus_zeek_nic_name: "ens18"
-ludus_zeek_nic_promisc: true
 ```
 
 ## Dependencies
@@ -63,10 +57,7 @@ ludus:
     cpus: 2
     linux: true
     roles:
-      - p4t12ick.ludus_ar_linux
       - 5tuk0v.ludus_zeek
-    role_vars:
-      ludus_ar_linux_splunk_ip: "10.5.20.10"
 ```
 
 ## License

@@ -6,7 +6,7 @@ galaxy_info:
   author: 5tuk0v
   description: An Ansible Role that installs Zeek on Linux hosts and optionally configures network interfaces for monitoring.
   company: ''
-  license: GPLv3
+  license: MIT
   min_ansible_version: "2.10"
   platforms:
     - name: Debian

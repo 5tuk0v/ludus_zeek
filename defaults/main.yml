@@ -1,17 +1,13 @@
 ---
 # defaults/main.yml
 
-# Optionally install Zeek addons via zkg - BZAR doesn't seem to work very well with recent Zeek versions
+# Optionally install Zeek addons via zkg - was meant for BZAR but it doesn't seem to work very well with recent Zeek versions
 ludus_zeek_install_addons: false
 ludus_zeek_addons:
   - bzar
-
-# If used with Splunk Attack Range, we can feed the Zeek logs to the Splunk Universal Forwarder
-ludus_zeek_splunk_forwarder_enabled: true
 
 # Zeek OBS repository base
 ludus_zeek_repo_base: "https://download.opensuse.org/repositories/security:/zeek"
 
 # NIC configuration
 ludus_zeek_nic_name: "ens18"
-ludus_zeek_nic_promisc: true
