@@ -6,6 +6,6 @@
 - import_tasks: install_addons.yml
   when: ludus_zeek_install_addons | bool
 
-- import_tasks: configure_interface.yml
-
 - import_tasks: configure_zeek.yml
+
+- import_tasks: configure_zeek_service.yml

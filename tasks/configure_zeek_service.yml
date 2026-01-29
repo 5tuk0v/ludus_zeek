@@ -1,0 +1,28 @@
+---
+# tasks/configure_zeek_service.yml
+
+- name: Create systemd service for Zeek
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/zeek.service
+    content: |
+      [Unit]
+      Description=Zeek Network Traffic Analyzer
+      After=network.target
+
+      [Service]
+      Type=forking
+      ExecStart=/opt/zeek/bin/zeekctl start
+      ExecStop=/opt/zeek/bin/zeekctl stop
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Enable Zeek service
+  become: true
+  ansible.builtin.systemd:
+    name: zeek
+    enabled: yes
+    daemon_reload: yes

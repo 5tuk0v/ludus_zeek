@@ -48,8 +48,8 @@ None.
 
 ```yaml
 ludus:
-  - vm_name: "{{ range_id }}-ar-linux"
-    hostname: "ar-linux"
+  - vm_name: "{{ range_id }}-ubuntu-zeek"
+    hostname: "linux-zeek"
     template: ubuntu-22.04-x64-server-template
     vlan: 20
     ip_last_octet: 11

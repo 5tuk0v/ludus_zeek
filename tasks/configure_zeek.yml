@@ -8,9 +8,6 @@
     path: '/opt/zeek/share/zeek/site/local.zeek'
     marker: "# {mark} ANSIBLE MANAGED BLOCK - Ludus Zeek Configuration"
     block: |
-      # Enable Zeek logging in JSON format - best for SIEM ingestion
-      redef LogAscii::json_timestamps = JSON::TS_ISO8601;
-      redef LogAscii::use_json = T;
       # Ignore checksum errors - seems needed for Proxmox virtual NICs
       redef ignore_checksums = T;
 
