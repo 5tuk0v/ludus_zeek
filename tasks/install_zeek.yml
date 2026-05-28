@@ -4,14 +4,25 @@
 - name: Determine Zeek distro codename
   set_fact:
     ludus_zeek_distro_codename: >-
-      {{ ('xUbuntu_' + ansible_distribution_version) if ansible_distribution == 'Ubuntu'
-         else ('Debian_' + ansible_distribution_version) if ansible_distribution == 'Debian'
-         else 'unsupported' }}
+      {{
+        ('xUbuntu_' + ansible_distribution_version)
+          if ansible_distribution == 'Ubuntu'
+        else ('Debian_' + ansible_distribution_version.split('.')[0])
+          if ansible_distribution == 'Debian'
+        else 'unsupported'
+      }}
 
 - name: Fail if unsupported distro
   ansible.builtin.fail:
     msg: "This role is only supported on Ubuntu or Debian (got {{ ansible_distribution }})"
   when: ludus_zeek_distro_codename == "unsupported"
+
+- name: Ensure gnupg is installed (for gpg)
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+    update_cache: yes
+  become: true
 
 - name: Download Zeek Release.key and dearmor
   ansible.builtin.get_url:

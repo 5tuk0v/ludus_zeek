@@ -9,8 +9,9 @@ An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubu
 
 ## Requirements
 
-- A Debian (bullseye, bookworm, trixie) or Ubuntu (focal, jammy, noble) host.  
-- To capture traffic across the entire VLAN, `bridge-ageing` must be disabled on the bridge interface of the range **on the Proxmox host**. Make sure to check [the Ludus documentation](https://docs.ludus.cloud/docs/networking#packet-capture).
+- A supported Debian (bookworm/12, trixie/13, or testing) or Ubuntu (focal/20.04, jammy/22.04, noble/24.04) host.  
+- **Note:** The Zeek repository no longer provides packages for Debian 11 (bullseye). Only Debian 12 (bookworm), Debian 13 (trixie), and Debian Testing are supported. The role will not attempt to use the Testing repo automatically.
+- To capture traffic across the entire VLAN, `bridge-ageing` must be disabled on the bridge interface of the range **on the Proxmox host**. This is only required when deploying Zeek to a range VM, not when deploying to a router VM (e.g., a Debian VM acting as the router in Ludus). Make sure to check [the Ludus documentation](https://docs.ludus.cloud/docs/networking#packet-capture).
 
 ## Role Variables
 
