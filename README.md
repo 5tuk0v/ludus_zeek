@@ -6,7 +6,7 @@ An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubu
 > [!WARNING]
 > This role deploys a minimal, unoptimized Zeek setup using the VM’s primary network interface for packet capture. Intended only for small, controlled test environments. Capturing high volumes of traffic may lead to packet loss, performance degradation, or unstable behavior.
 
-> [!INFO]
+> [!TIP]
 > This role is for general Zeek deployment in Ludus. If you want Zeek for a Splunk Attack Range, use [@P4T12ICK's role](https://github.com/P4T12ICK/ludus_ar_zeek) instead.
 
 ## Requirements
