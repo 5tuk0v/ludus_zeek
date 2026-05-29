@@ -1,16 +1,20 @@
+
 # Ansible Role: Zeek ([Ludus](https://ludus.cloud))
 
-An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubuntu hosts in Ludus environments. 
-
-**I initially made this role to add Zeek to my Ludus [Splunk Attack Range](https://github.com/splunk/attack_range). Shortly after publishing it, I realized that @P4T12ICK had already made an [Attack Range-specific role for Ludus](https://github.com/P4T12ICK/ludus_ar_zeek), and I didn't know about it. Lesson learned, next time I need to check Galaxy beforehand. If you are looking to add Zeek to your Ludus Splunk Attack Range, definitely use P4T12ICK's role. I have since removed all Splunk parts from this role, but figured I could keep it around for people who want to simply add Zeek to a range without Splunk.**
+An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubuntu hosts in Ludus environments.
 
 > [!WARNING]
-> This role deploys a very minimal and unoptimized Zeek setup that uses the VM’s primary network interface for packet capture. This configuration probably violates multiple best practices and is intended only for small, controlled test environments. Capturing high volumes of traffic may lead to packet loss, performance degradation, or unstable behavior.
+> This role deploys a minimal, unoptimized Zeek setup using the VM’s primary network interface for packet capture. Intended only for small, controlled test environments. Capturing high volumes of traffic may lead to packet loss, performance degradation, or unstable behavior.
+
+> [!INFO]
+> This role is for general Zeek deployment in Ludus. If you want Zeek for a Splunk Attack Range, use [@P4T12ICK's role](https://github.com/P4T12ICK/ludus_ar_zeek) instead.
+
+## Requirements
 
 - Supported: Debian bookworm/12, trixie/13; Ubuntu jammy/22.04, noble/24.04, questing/25.10, resolute/26.04.
 - Zeek is installed from the openSUSE Build Service (OBS) repo, with URLs built dynamically for supported versions.
 - Tested on Ubuntu 22.04 (jammy) and Debian 12 (bookworm).
-- For VLAN-wide capture, disable `bridge-ageing` on the Proxmox host’s bridge (see Ludus docs).
+- For VLAN-wide capture, disable `bridge-ageing` on the Proxmox host’s bridge (see [Ludus docs](https://docs.ludus.cloud/docs/networking#packet-capture)).
 
 ## Role Variables
 
