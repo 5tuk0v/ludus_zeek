@@ -13,7 +13,7 @@ An Ansible role to deploy [Zeek](https://github.com/zeek/zeek) on Debian and Ubu
 
 - Supported: Debian bookworm/12, trixie/13; Ubuntu jammy/22.04, noble/24.04, questing/25.10, resolute/26.04.
 - Zeek is installed from the openSUSE Build Service (OBS) repo, with URLs built dynamically for supported versions.
-- Tested on Ubuntu 22.04 (jammy) and Debian 12 (bookworm).
+- Tested on Ubuntu 22.04 (jammy), Ubuntu 24.04 (noble), and Debian 12 (bookworm).
 - For VLAN-wide capture, disable `bridge-ageing` on the Proxmox host’s bridge (see [Ludus docs](https://docs.ludus.cloud/docs/networking#packet-capture)).
 
 ## Role Variables
