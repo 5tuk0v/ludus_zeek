@@ -17,12 +17,20 @@
     msg: "This role is only supported on Ubuntu or Debian (got {{ ansible_distribution }})"
   when: ludus_zeek_distro_codename == "unsupported"
 
-- name: Ensure gnupg is installed (for gpg)
+- name: Ensure ca-certificates and gnupg are installed
   ansible.builtin.apt:
-    name: gnupg
+    name:
+      - ca-certificates
+      - gnupg
     state: present
     update_cache: yes
   become: true
+
+- name: Refresh CA certificates
+  ansible.builtin.command:
+    cmd: update-ca-certificates
+  become: true
+  changed_when: false
 
 - name: Download Zeek Release.key and dearmor
   ansible.builtin.get_url:
